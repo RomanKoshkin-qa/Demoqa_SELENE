@@ -4,10 +4,11 @@ from selene import browser, have
 from selene import command
 
 
+
 class RegistrationPage:  # ШАБЛОН
 
     def open(self):
-        browser.open('https://demoqa.com/automation-practice-form')
+        browser.open('/automation-practice-form')
         browser.execute_script('document.querySelector(".body-height").style.transform = "scale(.5)"')
         '''
         # might be also needed:
