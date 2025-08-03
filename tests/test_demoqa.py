@@ -1,13 +1,51 @@
-from selene import browser, be, have
+from selene import browser, be, have,command
 from pathlib import Path
 
+class RegistrationPage:  # ШАБЛОН
+    def __init__(self):
+        self.registered_user_data=browser.element('.table').all('td').even
+
+    def fill_first_name(self, value):
+        browser.element('#firstName').type(value)
+
+    def fill_second_name(self, value):
+        browser.element('#lastName').type(value)
+
+    def open(self):
+        browser.open('/automation-practice-form')
+
+        browser.execute_script('document.querySelector(".body-height").style.transform = "scale(.7)"')
+        browser.all('[id^=google_ads][id$=container__]').with_(timeout=10).wait_until(
+            have.size_greater_than_or_equal(3)
+        )
+        browser.all('[id^=google_ads][id$=container__]').perform(command.js.remove)
+
+
+
+
+    # browser.element('.table').all('td').should(
+    #     have.texts(
+    #         ('Student Name', 'Roman Koshkin'),
+    #         ('Student Email', 'Roman@gmail.com'),
+    #         ('Gender', 'Male'),
+    #         ('Mobile', '9031234567'),
+    #         ('Date of Birth', '11 May,1999'),
+    #         ('Subjects', 'Maths'),
+    #         ('Hobbies', 'Sports'),
+    #         ('Picture', 'ones.png'),
+    #         ('Address', 'Moscow Guena Street'),
+    #         ('State and City', 'Haryana Karnal'),
+    #     )
+    # )
 
 def test_tasks_demoqa():
-    browser.open('https://demoqa.com/automation-practice-form')
+    registration_page = RegistrationPage()
+    registration_page.open()
 
     # WHEN
-    browser.element('#firstName').type('Roman')
-    browser.element('#lastName').type('Koshkin')
+    registration_page.fill_first_name('Roman')  # fill заполнить
+    registration_page.fill_second_name('Koshkin')
+
     browser.element('#userEmail').type('Roman@gmail.com')
     browser.all('[name=gender]').element_by(have.value('Male')).element('..').click()  #.. это вверх подняться
     browser.element('#userNumber').type('9031234567')
@@ -29,19 +67,21 @@ def test_tasks_demoqa():
     browser.element("#submit").click()
 
     # THEN
-    browser.element('.table').all('td').should(
-        have.texts(
-            ('Student Name', 'Roman Koshkin'),
-            ('Student Email', 'Roman@gmail.com'),
-            ('Gender', 'Male'),
-            ('Mobile', '9031234567'),
-            ('Date of Birth', '11 May,1999'),
-            ('Subjects', 'Maths'),
-            ('Hobbies', 'Sports'),
-            ('Picture', 'ones.png'),
-            ('Address', 'Moscow Guena Street'),
-            ('State and City', 'Haryana Karnal'),
-        )
+
+    registration_page.registered_user_data.should(
+         have.exact_texts(
+        'Roman Koshkin',
+        'Roman@gmail.com',
+        'Male',
+        '9031234567',
+        '11 May,1999',
+        'Maths',
+        'Sports',
+        'ones.png',
+        'Moscow Guena Street',
+        'Haryana Karnal',
     )
+     )
+
 
     browser.quit()
