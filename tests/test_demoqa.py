@@ -1,15 +1,20 @@
 from selene import browser, be, have,command
 from pathlib import Path
 
+from pages.data import users
+from pages.data.users import User
+
+
 class RegistrationPage:  # ШАБЛОН
     def __init__(self):
         self.registered_user_data=browser.element('.table').all('td').even
+        self.submit_button=browser.element("#submit")
 
-    def fill_first_name(self, value):
-        browser.element('#firstName').type(value)
-
-    def fill_second_name(self, value):
-        browser.element('#lastName').type(value)
+    # def fill_first_name(self, value):
+    #     browser.element('#firstName').type(value)
+    #
+    # def fill_second_name(self, value):
+    #     browser.element('#lastName').type(value)
 
     def open(self):
         browser.open('/automation-practice-form')
@@ -37,14 +42,28 @@ class RegistrationPage:  # ШАБЛОН
     #         ('State and City', 'Haryana Karnal'),
     #     )
     # )
+    def register(self, user:User):
+        self.fill_first_name(user.first_name)
+        self.fill_last_name(user.last_name)
+        self.submit()
+
+    def submit(self):
+        self.submit_button.click()
+
+    def should_have_submited(self, first_name, last_name):
+        pass
+
 
 def test_tasks_demoqa():
     registration_page = RegistrationPage()
     registration_page.open()
-
+    roma= users.roma
     # WHEN
-    registration_page.fill_first_name('Roman')  # fill заполнить
-    registration_page.fill_second_name('Koshkin')
+    registration_page.register(roma)
+
+    registration_page.submit()
+
+    registration_page.should_have_submited(roma.first_name, roma.last_name)
 
     browser.element('#userEmail').type('Roman@gmail.com')
     browser.all('[name=gender]').element_by(have.value('Male')).element('..').click()  #.. это вверх подняться
